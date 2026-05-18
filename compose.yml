@@ -1,0 +1,50 @@
+services:
+  frontend:
+    build:
+      context: .
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /app
+    volumes:
+      - ../planner-backend:/app
+      - maven-cache:/root/.m2
+    command: mvn spring-boot:run
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/trip_planner
+      SPRING_DATASOURCE_USERNAME: mengwensu
+      SPRING_DATASOURCE_PASSWORD: trip_planner_password
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_OPEN_IN_VIEW: "false"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: trip_planner
+      POSTGRES_USER: mengwensu
+      POSTGRES_PASSWORD: trip_planner_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mengwensu -d trip_planner"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  maven-cache:
