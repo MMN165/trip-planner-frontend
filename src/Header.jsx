@@ -1,10 +1,7 @@
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
+import { AppBar, Toolbar, Typography, Stack, Button } from "@mui/material";
+import { PURPLE, PURPLE_DARK } from "./constants";
 
-export default function Header() {
+export default function Header({ onNav }) {
 	return (
 		<AppBar
 			position="sticky"
@@ -20,18 +17,31 @@ export default function Header() {
 				<Typography
 					variant="h6"
 					component="div"
-					sx={{ fontWeight: 700 }}
+					onClick={() => onNav("home")}
+					sx={{
+						fontWeight: 700,
+						cursor: "pointer",
+						userSelect: "none",
+					}}
 				>
 					MapMuse
 				</Typography>
 				<Stack direction="row" spacing={2}>
-					<Button variant="text" color="primary">
+					<Button
+						variant="text"
+						color="primary"
+						onClick={() => onNav("login")}
+					>
 						Login
 					</Button>
 					<Button
 						variant="contained"
-						color="primary"
-						sx={{ color: "#ffffff" }}
+						onClick={() => onNav("signup")}
+						sx={{
+							backgroundColor: PURPLE,
+							color: "#ffffff",
+							"&:hover": { backgroundColor: PURPLE_DARK },
+						}}
 					>
 						Sign up
 					</Button>

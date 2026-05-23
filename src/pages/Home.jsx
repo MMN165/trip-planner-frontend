@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Header from "../Header";
+import MapIcon from "@mui/icons-material/Map";
 import homeBg from "../assets/home-bkg.jpg";
 
 function Home() {
@@ -8,13 +8,12 @@ function Home() {
 		<Box
 			component="main"
 			sx={{
-				minHeight: "100vh",
+				height: "calc(100svh - 64px)",
 				display: "flex",
-				flexDirection: "column",
-				justifyContent: "center",
 				alignItems: "center",
+				justifyContent: "center",
 				textAlign: "center",
-				backgroundImage: `url(${homeBg})`,
+				backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${homeBg})`,
 				backgroundSize: "cover",
 				backgroundPosition: "center",
 				backgroundRepeat: "no-repeat",
@@ -24,36 +23,54 @@ function Home() {
 		>
 			<Box
 				sx={{
-					width: "100%",
-					maxWidth: 900,
-					px: 3,
 					display: "flex",
-					flexDirection: "column",
-					alignItems: "flex-start",
-					textAlign: "left",
+					flexDirection: { xs: "column", md: "row" },
+					alignItems: "center",
+					justifyContent: "space-between",
+					px: 3,
+					width: "100%",
+					maxWidth: 1100,
+					gap: 4,
 				}}
 			>
-				<Typography
-					variant="h1"
-					align="center"
+				<Box sx={{ textAlign: { xs: "center", md: "left" }, flex: 1 }}>
+					<Typography
+						variant="h1"
+						sx={{
+							mb: 1,
+							color: "#fff",
+							fontSize: "clamp(2rem, 5vw, 4rem)",
+							fontWeight: 800,
+						}}
+					>
+						Welcome to MapMuse
+					</Typography>
+
+					<Typography
+						variant="h4"
+						sx={{
+							mb: 1.5,
+							color: "#f3e8ff",
+							fontSize: "clamp(1rem, 2.2vw, 1.5rem)",
+							fontWeight: 600,
+						}}
+					>
+						Explore your next trip itinerary
+					</Typography>
+				</Box>
+
+				<Box
 					sx={{
-						mb: 2,
-						color: "#ffffff",
-						fontSize: "clamp(2.5rem, 5vw, 4rem)",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						minWidth: 260,
+						minHeight: 260,
+						borderRadius: "50%",
 					}}
 				>
-					Welcome to MapMuse
-				</Typography>
-				<Typography
-					variant="h5"
-					align="center"
-					sx={{
-						fontSize: "clamp(1.25rem, 2vw, 1.75rem)",
-						lineHeight: 1.5,
-					}}
-				>
-					Craft your perfect trip
-				</Typography>
+					<MapIcon sx={{ fontSize: 220, color: "#ffffff" }} />
+				</Box>
 			</Box>
 		</Box>
 	);
