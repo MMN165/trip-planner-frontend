@@ -14,9 +14,36 @@ import {
 import GoogleButton from "../components/GoogleButton";
 import { EyeIcon } from "../assets/icons/EyeIcon";
 import { PURPLE, PURPLE_DARK, BG, fieldSx } from "../constants";
+import API from "../api";
+
 
 export default function Login({ onNav }) {
 	const [showPw, setShowPw] = useState(false);
+	const [form, setForm] = useState({
+		email: "",
+		password: ""
+		});
+	const handleChange = (e) => {
+	setForm({ ...form, [e.target.name]: e.target.value });
+	};
+
+	const handleSubmit = async() => {
+		
+		try {
+			const response = await API.post("/users/login", {
+			email: form.email,
+			password: form.password
+			});
+			console.log("Login successful!", response.data);
+			localStorage.setItem("travelerProfile", JSON.stringify(response.data));
+			setTimeout(() => onNav("home"), 1400);			
+		} catch (err) {
+			console.error("Login error:", err.response?.data);
+			console.error("Status:", err.response?.status);
+    		console.error("Full error:", err);
+			
+		}
+	};
 
 	useEffect(() => {
 		const prev = document.body.style.overflow;
@@ -84,6 +111,9 @@ export default function Login({ onNav }) {
 							variant="outlined"
 							size="small"
 							sx={fieldSx}
+							name="email"
+							onChange={handleChange}
+
 						/>
 						<TextField
 							fullWidth
@@ -92,7 +122,7 @@ export default function Login({ onNav }) {
 							size="small"
 							type={showPw ? "text" : "password"}
 							sx={fieldSx}
-							InputProps={{
+							inputprops ={{
 								endAdornment: (
 									<InputAdornment position="end">
 										<IconButton
@@ -106,6 +136,8 @@ export default function Login({ onNav }) {
 									</InputAdornment>
 								),
 							}}
+							name="password"
+							onChange={handleChange}
 						/>
 					</Stack>
 
@@ -143,6 +175,7 @@ export default function Login({ onNav }) {
 								boxShadow: "0 4px 14px rgba(208,191,255,0.6)",
 							},
 						}}
+						onClick={handleSubmit}
 					>
 						Log in
 					</Button>

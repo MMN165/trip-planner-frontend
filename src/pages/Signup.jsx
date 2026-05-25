@@ -1,9 +1,9 @@
 ﻿import { useState, useEffect } from "react";
 import {
-	Box,
-	Card,
-	CardContent,
-	Paper,
+Box,
+Card,
+CardContent,
+Paper,
 	Typography,
 	Stack,
 	TextField,
@@ -26,7 +26,13 @@ import GoogleButton from "../components/GoogleButton";
 import { EyeIcon } from "../assets/icons/EyeIcon";
 import { BG, PURPLE, PURPLE_DARK, fieldSx } from "./../constants";
 import { buildTravelerProfile } from "../utils/formatTravelerProfile";
+import API from "../api";
 
+
+// Test connection immediately when file loads
+API.get("/users")
+  .then(res => console.log("✅ Backend connected:", res.data))
+  .catch(err => console.error("❌ Backend NOT connected:", err));
 const totalSteps = 8;
 
 const chipStyles = {
@@ -146,15 +152,30 @@ export default function Signup({ onNav }) {
 	};
 	const setSignupValue = (key, value) =>
 		setSignupValues((prev) => ({ ...prev, [key]: value }));
+
 	const startSurvey = () => {
+		
 		setShowSurvey(true);
 		setStep(0);
 	};
-	const handleSubmit = () => {
+	const handleSubmit = async() => {
 		const profile = buildTravelerProfile(values, signupValues);
-		localStorage.setItem("travelerProfile", JSON.stringify(profile));
-		setSubmitted(true);
-		setTimeout(() => onNav("home"), 1400);
+		try {
+			await API.post("/users/register", {
+				name: signupValues.fullName,
+				email: signupValues.email,
+				password: signupValues.password,
+			});
+			console.log("User saved!");
+			setShowSurvey(true);
+			setStep(0);
+			localStorage.setItem("travelerProfile", JSON.stringify(profile));
+			setSubmitted(true);
+			setTimeout(() => onNav("home"), 1400);
+		} catch (err) {
+			console.error("Error:", err.response?.data);
+		}
+		
 	};
 
 	// ── Submitted ──────────────────────────────────────────────────────────────
@@ -282,7 +303,7 @@ export default function Signup({ onNav }) {
 								onChange={(e) =>
 									setSignupValue("password", e.target.value)
 								}
-								InputProps={{
+								inputprops={{
 									endAdornment: (
 										<InputAdornment position="end">
 											<IconButton
@@ -313,7 +334,7 @@ export default function Signup({ onNav }) {
 										e.target.value,
 									)
 								}
-								InputProps={{
+								inputprops={{
 									endAdornment: (
 										<InputAdornment position="end">
 											<IconButton
@@ -385,6 +406,8 @@ export default function Signup({ onNav }) {
 			</Box>
 		);
 	}
+
+
 
 	// ── Survey ─────────────────────────────────────────────────────────────────
 	const progressPct = Math.min(((step + 1) / (totalSteps + 1)) * 100, 100);
