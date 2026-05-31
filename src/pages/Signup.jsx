@@ -32,7 +32,6 @@ import API from "../api";
 // Test connection immediately when file loads
 API.get("/users")
   .then(res => console.log("✅ Backend connected:", res.data))
-  .catch(err => console.error("❌ Backend NOT connected:", err));
 const totalSteps = 8;
 
 const chipStyles = {
@@ -159,22 +158,26 @@ export default function Signup({ onNav }) {
 		setStep(0);
 	};
 	const handleSubmit = async() => {
-		const profile = buildTravelerProfile(values, signupValues);
-		try {
-			await API.post("/users/register", {
+
+		const response = await API.post("/users/register", {
 				name: signupValues.fullName,
 				email: signupValues.email,
 				password: signupValues.password,
 			});
-			console.log("User saved!");
-			setShowSurvey(true);
-			setStep(0);
-			localStorage.setItem("travelerProfile", JSON.stringify(profile));
-			setSubmitted(true);
-			setTimeout(() => onNav("home"), 1400);
-		} catch (err) {
-			console.error("Error:", err.response?.data);
-		}
+
+		
+		console.log("User saved!");
+		const profile = buildTravelerProfile(values, signupValues);
+		profile.name = signupValues.fullName;
+		profile.email = signupValues.email;
+		
+		profile.id = response.data.id;
+		setShowSurvey(true);
+		setStep(0);
+		
+		localStorage.setItem("travelerProfile", JSON.stringify(profile));
+		setSubmitted(true);
+		setTimeout(() => onNav("home"), 1400);
 		
 	};
 

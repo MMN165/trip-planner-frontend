@@ -36,7 +36,7 @@ export default function Login({ onNav }) {
 			});
 			console.log("Login successful!", response.data);
 			localStorage.setItem("travelerProfile", JSON.stringify(response.data));
-			setTimeout(() => onNav("home"), 1400);			
+			setTimeout(() => onNav("home"));
 		} catch (err) {
 			console.error("Login error:", err.response?.data);
 			console.error("Status:", err.response?.status);
