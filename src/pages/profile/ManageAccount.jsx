@@ -4,7 +4,7 @@ import { PURPLE_DARK, PURPLE } from "../../constants";
 import API from "../../api";
 
 function ManageAccount({ profile }) {
-    const travelerProfile = JSON.parse(localStorage.getItem("travelerProfile"));
+    const travelerProfile = JSON.parse(localStorage.getItem("travelerProfile")) || {};
 
     const [image, setImage] = useState(null);
 
@@ -18,10 +18,10 @@ function ManageAccount({ profile }) {
 
     const [form, setForm] = useState({
 
-        name: travelerProfile.name,
-		email: travelerProfile.email,
-		password: travelerProfile.password, 
-        username: travelerProfile.username
+        name: travelerProfile.name || "",
+		email: travelerProfile.email || "",
+		// password: travelerProfile.password, 
+        username: travelerProfile.username || ""
 		});
 
 
@@ -95,7 +95,7 @@ function ManageAccount({ profile }) {
             profile.name = form.name;
             profile.username = form.username;
             profile.email = form.email;
-            profile.password = form.password;
+            // profile.password = form.password;
             
             localStorage.setItem("travelerProfile", JSON.stringify(profile));
 
@@ -109,11 +109,14 @@ function ManageAccount({ profile }) {
         }
     };
     const handleDeleteAccount = async () => {
+        console.log("Attempting to delete account...");
         const confirm = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
         if (!confirm) return;
 
         try {
             const profile = JSON.parse(localStorage.getItem("travelerProfile"));
+            console.log("Deleting account for user ID:", profile?.id);
+
             await API.delete(`/users/${profile.id}`);
             localStorage.removeItem("travelerProfile");
             localStorage.removeItem("profileImage");
@@ -123,7 +126,9 @@ function ManageAccount({ profile }) {
             window.location.href = "/";
 
         } catch (err) {
-            console.error("Error deleting account:", err.response?.data);
+            console.error("Delete error status:", err.response?.status);
+            console.error("Delete error data:", err.response?.data);
+            alert("Error: " + err.response?.status);
         }
         
     };
@@ -145,7 +150,7 @@ function ManageAccount({ profile }) {
                         src={image}
                         sx={{ width: 80, height: 80, fontSize: "32px", bgcolor: PURPLE }}
                     >
-                        {!image && name?.charAt(0)}
+                        {!image && form.name?.charAt(0)}
                     </Avatar>
                     <Box>
                         <input
@@ -205,15 +210,15 @@ function ManageAccount({ profile }) {
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                         <Box sx={{ display: "flex", gap: 1 }}>
                             <Typography sx={{ color: "#666", minWidth: "100px" }}>Full Name</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{travelerProfile.name || "—"}</Typography>
+                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.name || "—"}</Typography>
                         </Box>
                         <Box sx={{ display: "flex", gap: 1 }}>
                             <Typography sx={{ color: "#666", minWidth: "100px" }}>Username</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{travelerProfile.username || "—"}</Typography>
+                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.username || "—"}</Typography>
                         </Box>
                         <Box sx={{ display: "flex", gap: 1 }}>
                             <Typography sx={{ color: "#666", minWidth: "100px" }}>Email</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{travelerProfile.email || "—"}</Typography>
+                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.email || "—"}</Typography>
                         </Box>
                         {/* <Box sx={{ display: "flex", gap: 1 }}>
                             <Typography sx={{ color: "#666", minWidth: "100px" }}>Phone</Typography>
