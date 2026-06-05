@@ -87,13 +87,15 @@ function ManageAccount({ profile }) {
             const response = await API.put(`/users/${profile.id}`, {
                 name: form.name,
                 username: form.username,
-                email: form.email
+                email: form.email,
+                // password: profile.password
                 // phone: phone,
             });
             console.log("3. Response:", response.data);
             profile.name = form.name;
             profile.username = form.username;
             profile.email = form.email;
+            profile.password = form.password;
             
             localStorage.setItem("travelerProfile", JSON.stringify(profile));
 
@@ -106,7 +108,25 @@ function ManageAccount({ profile }) {
             console.error("Message:", err.message);      
         }
     };
+    const handleDeleteAccount = async () => {
+        const confirm = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+        if (!confirm) return;
 
+        try {
+            const profile = JSON.parse(localStorage.getItem("travelerProfile"));
+            await API.delete(`/users/${profile.id}`);
+            localStorage.removeItem("travelerProfile");
+            localStorage.removeItem("profileImage");
+            localStorage.removeItem("user");
+
+            console.log("Account deleted!");
+            window.location.href = "/";
+
+        } catch (err) {
+            console.error("Error deleting account:", err.response?.data);
+        }
+        
+    };
     return (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 
@@ -313,7 +333,7 @@ function ManageAccount({ profile }) {
                             <Button
                                 variant="contained"
                                 sx={{ backgroundColor: PURPLE, color: "#fff" }}
-                                onClick={() => setEditingPassword(false)}
+                                onClick={handlePasswordUpdate}
                             >
                                 Update Password
                             </Button>
@@ -335,10 +355,7 @@ function ManageAccount({ profile }) {
                 <Typography variant="h6" sx={{ fontWeight: 600, color: "#d32f2f", mb: 1 }}>
                     Delete Account
                 </Typography>
-                <Typography sx={{ color: "#666", mb: 2, fontSize: "14px" }}>
-                    Once you delete your account, there is no going back.
-                </Typography>
-                <Button variant="outlined" color="error">
+                <Button variant="outlined" color="error" onClick={handleDeleteAccount}>
                     Delete Account
                 </Button>
             </Box>
