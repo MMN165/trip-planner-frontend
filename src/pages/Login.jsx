@@ -16,32 +16,32 @@ import { EyeIcon } from "../assets/icons/EyeIcon";
 import { PURPLE, PURPLE_DARK, BG, fieldSx } from "../constants";
 import API from "../api";
 
-
 export default function Login({ onNav }) {
 	const [showPw, setShowPw] = useState(false);
 	const [form, setForm] = useState({
 		email: "",
-		password: ""
-		});
+		password: "",
+	});
 	const handleChange = (e) => {
-	setForm({ ...form, [e.target.name]: e.target.value });
+		setForm({ ...form, [e.target.name]: e.target.value });
 	};
 
-	const handleSubmit = async() => {
-		
+	const handleSubmit = async () => {
 		try {
 			const response = await API.post("/users/login", {
-			email: form.email,
-			password: form.password
+				email: form.email,
+				password: form.password,
 			});
 			console.log("Login successful!", response.data);
-			localStorage.setItem("travelerProfile", JSON.stringify(response.data));
-			setTimeout(() => onNav("home"));
+			localStorage.setItem(
+				"travelerProfile",
+				JSON.stringify(response.data),
+			);
+			setTimeout(() => onNav("trips"));
 		} catch (err) {
 			console.error("Login error:", err.response?.data);
 			console.error("Status:", err.response?.status);
-    		console.error("Full error:", err);
-			
+			console.error("Full error:", err);
 		}
 	};
 
@@ -113,7 +113,6 @@ export default function Login({ onNav }) {
 							sx={fieldSx}
 							name="email"
 							onChange={handleChange}
-
 						/>
 						<TextField
 							fullWidth
@@ -122,7 +121,7 @@ export default function Login({ onNav }) {
 							size="small"
 							type={showPw ? "text" : "password"}
 							sx={fieldSx}
-							inputprops ={{
+							inputprops={{
 								endAdornment: (
 									<InputAdornment position="end">
 										<IconButton

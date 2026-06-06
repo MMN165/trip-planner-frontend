@@ -6,6 +6,11 @@ export default function Header({ onNav }) {
 	const profile = JSON.parse(localStorage.getItem("travelerProfile"));
 	const [open, setOpen] = useState(false);
 
+	const navAndClose = (screen) => {
+		onNav(screen);
+		setOpen(false);
+	};
+
 	return (
 		<AppBar
 			position="sticky"
@@ -18,7 +23,6 @@ export default function Header({ onNav }) {
 			}}
 		>
 			<Toolbar sx={{ justifyContent: "space-between" }}>
-				
 				{/* Logo */}
 				<Typography
 					variant="h6"
@@ -36,15 +40,29 @@ export default function Header({ onNav }) {
 				<Stack
 					direction="row"
 					spacing={2}
-					sx={{ position: "relative" }}
+					sx={{ position: "relative", alignItems: "center" }}
 				>
 					{profile ? (
 						<>
-							{/* Profile Button */}
+							{/* My Trips inline link */}
+							<Button
+								variant="text"
+								onClick={() => onNav("trips")}
+								sx={{
+									textTransform: "none",
+									fontWeight: 600,
+									color: "#555",
+									"&:hover": { color: PURPLE },
+								}}
+							>
+								My Trips
+							</Button>
+
+							{/* Profile dropdown button */}
 							<Button
 								variant="text"
 								color="primary"
-								onClick={() => setOpen(!open)}
+								onClick={() => setOpen((v) => !v)}
 								style={{
 									display: "flex",
 									alignItems: "center",
@@ -58,10 +76,8 @@ export default function Header({ onNav }) {
 								}}
 							>
 								{profile.name} ▼
-
 							</Button>
 
-							{/* Dropdown */}
 							{open && (
 								<div
 									style={{
@@ -71,8 +87,7 @@ export default function Header({ onNav }) {
 										backgroundColor: "#fff",
 										border: "1px solid #e0e0e0",
 										borderRadius: "12px",
-										boxShadow:
-											"0 4px 12px rgba(0,0,0,0.1)",
+										boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
 										zIndex: 1000,
 										minWidth: "180px",
 										overflow: "hidden",
@@ -80,10 +95,18 @@ export default function Header({ onNav }) {
 								>
 									<Button
 										fullWidth
-										onClick={() => {
-											onNav("profile");
-											setOpen(false);
+										onClick={() => navAndClose("trips")}
+										style={{
+											justifyContent: "flex-start",
+											padding: "12px 16px",
+											color: "#333",
 										}}
+									>
+										My Trips
+									</Button>
+									<Button
+										fullWidth
+										onClick={() => navAndClose("profile")}
 										style={{
 											justifyContent: "flex-start",
 											padding: "12px 16px",
@@ -92,12 +115,11 @@ export default function Header({ onNav }) {
 									>
 										My Account
 									</Button>
-
 									<Button
 										fullWidth
 										onClick={() => {
 											localStorage.removeItem(
-												"travelerProfile"
+												"travelerProfile",
 											);
 											setOpen(false);
 											onNav("home");
@@ -122,16 +144,13 @@ export default function Header({ onNav }) {
 							>
 								Login
 							</Button>
-
 							<Button
 								variant="contained"
 								onClick={() => onNav("signup")}
 								sx={{
 									backgroundColor: PURPLE,
 									color: "#ffffff",
-									"&:hover": {
-										backgroundColor: PURPLE_DARK,
-									},
+									"&:hover": { backgroundColor: PURPLE_DARK },
 								}}
 							>
 								Sign up

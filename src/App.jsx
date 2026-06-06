@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { Box, Typography } from "@mui/material";
 import Header from "./Header";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Profile from "./pages/profile/Profile";
+import Trips from "./pages/Trips";
+import Itinerary from "./pages/Itinerary";
 import { BG } from "./constants";
 
 const theme = createTheme({
@@ -20,18 +21,28 @@ const theme = createTheme({
 });
 
 function App() {
-	const [screen, setScreen] = useState("home"); // "login" | "signup" | "home"
-	const [profile, setProfile] = useState(null);
+	const [screen, setScreen] = useState("home");
+	const [selectedTrip, setSelectedTrip] = useState(null);
+
+	const handleNav = (screen, data) => {
+		if (screen === "itinerary" && data) {
+			setSelectedTrip(data); // must be set first
+		}
+		setScreen(screen);
+	};
+
 	return (
-		<>
-			<ThemeProvider theme={theme}>
-				<Header onNav={setScreen} />
-				{screen === "login" && <Login onNav={setScreen} />}
-				{screen === "signup" && <Signup onNav={setScreen} />}
-				{screen === "home" && <Home />}
-				{screen === "profile" && <Profile onNav={profile} />}
-			</ThemeProvider>
-		</>
+		<ThemeProvider theme={theme}>
+			<Header onNav={handleNav} />
+			{screen === "login" && <Login onNav={handleNav} />}
+			{screen === "signup" && <Signup onNav={handleNav} />}
+			{screen === "home" && <Home />}
+			{screen === "profile" && <Profile onNav={handleNav} />}
+			{screen === "trips" && <Trips onNav={handleNav} />}
+			{screen === "itinerary" && (
+				<Itinerary trip={selectedTrip} onNav={handleNav} />
+			)}
+		</ThemeProvider>
 	);
 }
 
