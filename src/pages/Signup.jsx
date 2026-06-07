@@ -1,9 +1,9 @@
 ﻿import { useState, useEffect } from "react";
 import {
-Box,
-Card,
-CardContent,
-Paper,
+	Box,
+	Card,
+	CardContent,
+	Paper,
 	Typography,
 	Stack,
 	TextField,
@@ -28,11 +28,9 @@ import { BG, PURPLE, PURPLE_DARK, fieldSx } from "./../constants";
 import { buildTravelerProfile } from "../utils/formatTravelerProfile";
 import API from "../api";
 
-
 // Test connection immediately when file loads
-API.get("/users")
-  .then(res => console.log("✅ Backend connected:", res.data))
-const totalSteps = 8;
+API.get("/users").then((res) => console.log("✅ Backend connected:", res.data));
+const totalSteps = 4;
 
 const chipStyles = {
 	px: 2,
@@ -46,11 +44,7 @@ const stepMeta = [
 	{ title: "Basic Info", icon: <PersonIcon /> },
 	{ title: "Travel Experience", icon: <FlightTakeoffIcon /> },
 	{ title: "Budget Compatibility", icon: <AttachMoneyIcon /> },
-	{ title: "Travel Personality", icon: <DirectionsWalkIcon /> },
-	{ title: "Group Dynamics", icon: <GroupIcon /> },
 	{ title: "Food & Lifestyle", icon: <RestaurantIcon /> },
-	{ title: "Destination Preferences", icon: <PublicIcon /> },
-	{ title: "Logistics & Ending", icon: <EventIcon /> },
 ];
 
 export default function Signup({ onNav }) {
@@ -69,31 +63,16 @@ export default function Signup({ onNav }) {
 		name: "",
 		ageRange: "",
 		location: "",
-		passportStatus: "",
-		travelFrequency: "",
 		tripTypes: [],
-		budgetLevel: "",
-		spendingStyle: "",
-		lodging: "",
-		shareRooms: "",
 		travelPace: "",
 		wakeUp: "",
-		nightlife: 3,
-		downtime: 3,
+		downtime: "",
 		idealDay: "",
-		planningStyle: "",
-		frustrations: [],
-		socialLevel: 3,
-		aloneTime: "",
-		foodNotes: "",
+		budgetLevel: "",
+		spendingStyle: "",
+		dietaryRestrictions: "",
 		foodAdventure: 3,
 		alcohol: "",
-		dreamDestinations: "",
-		climates: [],
-		regions: [],
-		availability: "",
-		planningHorizon: "",
-		favoriteTrip: "",
 	});
 
 	useEffect(() => {
@@ -153,32 +132,36 @@ export default function Signup({ onNav }) {
 		setSignupValues((prev) => ({ ...prev, [key]: value }));
 
 	const startSurvey = () => {
-		
 		setShowSurvey(true);
 		setStep(0);
 	};
-	const handleSubmit = async() => {
-
-		const response = await API.post("/users/register", {
+	const handleSubmit = async () => {
+		try {
+			const response = await API.post("/users/register", {
 				name: signupValues.fullName,
 				email: signupValues.email,
 				password: signupValues.password,
 			});
+			console.log("User saved!");
 
-		
-		console.log("User saved!");
-		const profile = buildTravelerProfile(values, signupValues);
-		profile.name = signupValues.fullName;
-		profile.email = signupValues.email;
-		
-		profile.id = response.data.id;
-		setShowSurvey(true);
-		setStep(0);
-		
-		localStorage.setItem("travelerProfile", JSON.stringify(profile));
-		setSubmitted(true);
-		setTimeout(() => onNav("home"), 1400);
-		
+			const userId = response.data.id;
+
+			// build preferences payload
+			const profile = buildTravelerProfile(values, signupValues);
+			profile.name = signupValues.fullName;
+			profile.email = signupValues.email;
+			profile.id = userId;
+			setShowSurvey(true);
+			setStep(0);
+
+			localStorage.setItem("travelerProfile", JSON.stringify(profile));
+			await API.put(`/users/${userId}/preferences`, profile.preferences);
+			setSubmitted(true);
+
+			setTimeout(() => onNav("trips"), 1400);
+		} catch (error) {
+			console.error("Registration failed:", error);
+		}
 	};
 
 	// ── Submitted ──────────────────────────────────────────────────────────────
@@ -410,8 +393,6 @@ export default function Signup({ onNav }) {
 		);
 	}
 
-
-
 	// ── Survey ─────────────────────────────────────────────────────────────────
 	const progressPct = Math.min(((step + 1) / (totalSteps + 1)) * 100, 100);
 
@@ -560,34 +541,11 @@ export default function Signup({ onNav }) {
 										}
 										fullWidth
 									/>
-									<Typography sx={{ fontWeight: 700 }}>
-										Passport status
-									</Typography>
-									{renderChips(
-										[
-											"Have passport",
-											"Need renewal",
-											"No passport",
-										],
-										"passportStatus",
-									)}
 								</Stack>
 							)}
 
 							{step === 2 && (
 								<Stack spacing={3}>
-									<Typography sx={{ fontWeight: 700 }}>
-										How often do you travel?
-									</Typography>
-									{renderChips(
-										[
-											"A few times a year",
-											"Once a year",
-											"Rarely",
-											"First big trip",
-										],
-										"travelFrequency",
-									)}
 									<Typography sx={{ fontWeight: 700 }}>
 										What kinds of trips do you usually
 										enjoy?
@@ -610,61 +568,6 @@ export default function Signup({ onNav }) {
 										"tripTypes",
 										true,
 									)}
-								</Stack>
-							)}
-
-							{step === 3 && (
-								<Stack spacing={3}>
-									<Typography sx={{ fontWeight: 700 }}>
-										What's your typical budget for a 5–7 day
-										trip?
-									</Typography>
-									{renderChips(
-										[
-											"Budget traveler ($)",
-											"Moderate ($$)",
-											"Comfortable ($$$)",
-											"Luxury ($$$$)",
-										],
-										"budgetLevel",
-									)}
-									<Typography sx={{ fontWeight: 700 }}>
-										Which statement sounds most like you?
-									</Typography>
-									{renderChips(
-										[
-											"I'll spend to maximize experiences",
-											"I balance cost and comfort",
-											"I try to save where possible",
-											"Cheapest option always",
-										],
-										"spendingStyle",
-									)}
-									<Typography sx={{ fontWeight: 700 }}>
-										Preferred lodging?
-									</Typography>
-									{renderChips(
-										[
-											"Hostel",
-											"Airbnb",
-											"Hotel",
-											"Resort",
-											"Don't care",
-										],
-										"lodging",
-									)}
-									<Typography sx={{ fontWeight: 700 }}>
-										Are you comfortable sharing rooms?
-									</Typography>
-									{renderChips(
-										["Yes", "Maybe", "No"],
-										"shareRooms",
-									)}
-								</Stack>
-							)}
-
-							{step === 4 && (
-								<Stack spacing={3}>
 									<Typography sx={{ fontWeight: 700 }}>
 										What's your travel pace?
 									</Typography>
@@ -693,29 +596,18 @@ export default function Signup({ onNav }) {
 										<Typography
 											sx={{ fontWeight: 700, mb: 1 }}
 										>
-											How important is nightlife?
-										</Typography>
-										<Slider
-											value={values.nightlife}
-											onChange={(e, v) =>
-												setValue("nightlife", v)
-											}
-											min={1}
-											max={5}
-											marks
-											valueLabelDisplay="auto"
-										/>
-									</Box>
-									<Box>
-										<Typography
-											sx={{ fontWeight: 700, mb: 1 }}
-										>
 											How important is downtime?
 										</Typography>
 										<Slider
-											value={values.downtime}
+											value={
+												Number(
+													values.downtime?.split(
+														"/",
+													)[0],
+												) || 3
+											}
 											onChange={(e, v) =>
-												setValue("downtime", v)
+												setValue("downtime", `${v}/5`)
 											}
 											min={1}
 											max={5}
@@ -739,72 +631,43 @@ export default function Signup({ onNav }) {
 								</Stack>
 							)}
 
-							{step === 5 && (
+							{step === 3 && (
 								<Stack spacing={3}>
 									<Typography sx={{ fontWeight: 700 }}>
-										How do you handle planning?
+										What's your typical budget for a trip?
 									</Typography>
 									{renderChips(
 										[
-											"I plan everything",
-											"I like shared planning",
-											"I prefer following along",
+											"Budget traveler ($)",
+											"Moderate ($$)",
+											"Comfortable ($$$)",
+											"Luxury ($$$$)",
 										],
-										"planningStyle",
+										"budgetLevel",
 									)}
 									<Typography sx={{ fontWeight: 700 }}>
-										What frustrates you most while
-										traveling?
+										Which statement sounds most like you?
 									</Typography>
 									{renderChips(
 										[
-											"Being late",
-											"Overspending",
-											"Overplanning",
-											"Constant schedule changes",
-											"Too much partying",
-											"Not enough flexibility",
-											"Messiness",
-											"Slow decision making",
+											"I'll spend to maximize experiences",
+											"I balance cost and comfort",
+											"I try to save where possible",
+											"Cheapest option always",
 										],
-										"frustrations",
-										true,
-									)}
-									<Box>
-										<Typography
-											sx={{ fontWeight: 700, mb: 1 }}
-										>
-											How social are you on trips?
-										</Typography>
-										<Slider
-											value={values.socialLevel}
-											onChange={(e, v) =>
-												setValue("socialLevel", v)
-											}
-											min={1}
-											max={5}
-											marks
-											valueLabelDisplay="auto"
-										/>
-									</Box>
-									<Typography sx={{ fontWeight: 700 }}>
-										Do you need alone time while traveling?
-									</Typography>
-									{renderChips(
-										["Frequently", "Sometimes", "Rarely"],
-										"aloneTime",
+										"spendingStyle",
 									)}
 								</Stack>
 							)}
 
-							{step === 6 && (
+							{step === 4 && (
 								<Stack spacing={3}>
 									<TextField
-										label="Food preferences or restrictions"
-										value={values.foodNotes}
+										label="Dietary restrictions"
+										value={values.dietaryRestrictions}
 										onChange={(e) =>
 											setValue(
-												"foodNotes",
+												"dietaryRestrictions",
 												e.target.value,
 											)
 										}
@@ -817,14 +680,24 @@ export default function Signup({ onNav }) {
 											How adventurous are you with food?
 										</Typography>
 										<Slider
-											value={values.foodAdventure}
+											value={
+												Number(
+													values.foodAdventure
+														?.toString()
+														.split("/")[0],
+												) || 3
+											}
 											onChange={(e, v) =>
-												setValue("foodAdventure", v)
+												setValue(
+													"foodAdventure",
+													`${v}/5`,
+												)
 											}
 											min={1}
 											max={5}
 											marks
 											valueLabelDisplay="auto"
+											valueLabelFormat={(v) => `${v}/5`}
 										/>
 									</Box>
 									<Typography sx={{ fontWeight: 700 }}>
@@ -839,94 +712,6 @@ export default function Signup({ onNav }) {
 										],
 										"alcohol",
 									)}
-								</Stack>
-							)}
-
-							{step === 7 && (
-								<Stack spacing={3}>
-									<TextField
-										label="Top dream destinations"
-										value={values.dreamDestinations}
-										onChange={(e) =>
-											setValue(
-												"dreamDestinations",
-												e.target.value,
-											)
-										}
-										fullWidth
-									/>
-									<Typography sx={{ fontWeight: 700 }}>
-										Which climates do you prefer?
-									</Typography>
-									{renderChips(
-										[
-											"Tropical",
-											"Cold/snowy",
-											"Mild",
-											"Desert",
-											"Doesn't matter",
-										],
-										"climates",
-										true,
-									)}
-									<Typography sx={{ fontWeight: 700 }}>
-										Which regions interest you?
-									</Typography>
-									{renderChips(
-										[
-											"Europe",
-											"Asia",
-											"South America",
-											"Caribbean",
-											"US/Canada",
-											"Africa",
-											"Australia/New Zealand",
-										],
-										"regions",
-										true,
-									)}
-								</Stack>
-							)}
-
-							{step === 8 && (
-								<Stack spacing={3}>
-									<Typography sx={{ fontWeight: 700 }}>
-										Typical trip availability
-									</Typography>
-									{renderChips(
-										[
-											"Weekend only",
-											"Long weekends",
-											"1 week trips",
-											"2+ weeks",
-										],
-										"availability",
-									)}
-									<Typography sx={{ fontWeight: 700 }}>
-										How far ahead do you prefer planning?
-									</Typography>
-									{renderChips(
-										[
-											"Last minute",
-											"1–2 months",
-											"3–6 months",
-											"Far in advance",
-										],
-										"planningHorizon",
-									)}
-									<TextField
-										multiline
-										minRows={3}
-										label="Favorite trip you've ever taken"
-										value={values.favoriteTrip}
-										onChange={(e) =>
-											setValue(
-												"favoriteTrip",
-												e.target.value,
-											)
-										}
-										fullWidth
-									/>
 								</Stack>
 							)}
 						</Box>
