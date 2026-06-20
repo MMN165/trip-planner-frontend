@@ -241,8 +241,19 @@ export default function Trips({ onNav }) {
 		setError(null);
 		const start = Date.now();
 
+		const profile = JSON.parse(
+			localStorage.getItem("travelerProfile") || "{}",
+		);
+		const userId = profile?.id;
+		console.log("userId:", userId);
+		if (!userId) {
+			setError("Unable to load trips because no user is signed in.");
+			setLoading(false);
+			return;
+		}
+
 		try {
-			const res = await API.get("/trip");
+			const res = await API.get(`/trip/user/${userId}`);
 			setTrips(res.data);
 		} catch (err) {
 			setError("Failed to load trips.");
@@ -385,6 +396,7 @@ export default function Trips({ onNav }) {
 					<Dialog
 						open={isDialogOpen}
 						onClose={() => setIsDialogOpen(false)}
+						PaperProps={{ sx: { borderRadius: 3 } }}
 					>
 						<DialogTitle>New trip</DialogTitle>
 						<DialogContent>
@@ -401,57 +413,53 @@ export default function Trips({ onNav }) {
 								<LocalizationProvider
 									dateAdapter={AdapterDateFns}
 								>
-									<Stack direction="row" gap={2}>
-										<DatePicker
-											label="Start date"
-											value={
-												startDate
-													? new Date(startDate)
-													: null
-											}
-											onChange={(value) =>
-												setStartDate(
-													value
-														? value
-																.toISOString()
-																.slice(0, 10)
-														: "",
-												)
-											}
-											renderInput={(params) => (
-												<TextField
-													{...params}
-													fullWidth
-													size="small"
-												/>
-											)}
-										/>
+									<DatePicker
+										label="Start date"
+										value={
+											startDate
+												? new Date(startDate)
+												: null
+										}
+										onChange={(value) =>
+											setStartDate(
+												value
+													? value
+															.toISOString()
+															.slice(0, 10)
+													: "",
+											)
+										}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												fullWidth
+												size="small"
+											/>
+										)}
+									/>
 
-										<DatePicker
-											label="End date"
-											value={
-												endDate
-													? new Date(endDate)
-													: null
-											}
-											onChange={(value) =>
-												setEndDate(
-													value
-														? value
-																.toISOString()
-																.slice(0, 10)
-														: "",
-												)
-											}
-											renderInput={(params) => (
-												<TextField
-													{...params}
-													fullWidth
-													size="small"
-												/>
-											)}
-										/>
-									</Stack>
+									<DatePicker
+										label="End date"
+										value={
+											endDate ? new Date(endDate) : null
+										}
+										onChange={(value) =>
+											setEndDate(
+												value
+													? value
+															.toISOString()
+															.slice(0, 10)
+													: "",
+											)
+										}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												fullWidth
+												size="small"
+											/>
+										)}
+									/>
 								</LocalizationProvider>
 								{formError && (
 									<Typography
