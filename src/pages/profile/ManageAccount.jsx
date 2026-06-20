@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, TextField, Typography, Avatar, Button, Divider } from "@mui/material";
+import { Box, TextField, Typography, Avatar, Button, Divider, Paper } from "@mui/material";
 import { PURPLE_DARK, PURPLE } from "../../constants";
 import API from "../../api";
 
@@ -133,237 +133,259 @@ function ManageAccount({ profile }) {
         
     };
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+			sx={{
+				backgroundColor: "#f9fafb",
+				minHeight: "100vh",
+				p: 4,
+			}}
+		>
 
-            {/* Title */}
-            <Typography variant="h4" sx={{ fontWeight: 700, color: "#000" }}>
-                Manage Account
-            </Typography>
+			<Paper
+				elevation={3}
+				sx={{
+					maxWidth: 900,
+					mx: "auto",
+					borderRadius: 4,
+					p: 5,
+					border:
+						"1px solid rgba(0,0,0,0.08)",
+				}}
+			>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 
-            {/* Profile Picture */}
-            <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: PURPLE_DARK, mb: 2 }}>
-                    Profile Picture
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-                    <Avatar
-                        src={image}
-                        sx={{ width: 80, height: 80, fontSize: "32px", bgcolor: PURPLE }}
-                    >
-                        {!image && form.name?.charAt(0)}
-                    </Avatar>
+
+                    {/* Title */}
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: "#000" }}>
+                        Manage Account
+                    </Typography>
+
+                    {/* Profile Picture */}
                     <Box>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            id="upload-photo"
-                            style={{ display: "none" }}
-                            onChange={handleImageUpload}
-                        />
-                        <label htmlFor="upload-photo">
-                            <Button
-                                variant="contained"
-                                component="span"
-                                sx={{ mr: 1, backgroundColor: PURPLE, color: "#fff" }}
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: PURPLE_DARK, mb: 2 }}>
+                            Profile Picture
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+                            <Avatar
+                                src={image}
+                                sx={{ width: 80, height: 80, fontSize: "32px", bgcolor: PURPLE }}
                             >
-                                Upload Photo
-                            </Button>
-                        </label>
-                        {image && (
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={() => {
-                                    setImage(null);
-                                    localStorage.removeItem("profileImage");
-                                }}
-                            >
-                                Remove
-                            </Button>
-                        )}
-                    </Box>
-                </Box>
-            </Box>
-
-            <Divider />
-
-            {/* Account Information */}
-            <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: PURPLE_DARK }}>
-                        Account Information
-                    </Typography>
-                    {!editingAccount && (
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => setEditingAccount(true)}
-                            sx={{ color: PURPLE_DARK, borderColor: PURPLE_DARK }}
-                        >
-                            Edit Account
-                        </Button>
-                    )}
-                </Box>
-
-                {/* Display Mode */}
-                {!editingAccount ? (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                            <Typography sx={{ color: "#666", minWidth: "100px" }}>Full Name</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.name || "—"}</Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                            <Typography sx={{ color: "#666", minWidth: "100px" }}>Username</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.username || "—"}</Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                            <Typography sx={{ color: "#666", minWidth: "100px" }}>Email</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.email || "—"}</Typography>
-                        </Box>
-                        {/* <Box sx={{ display: "flex", gap: 1 }}>
-                            <Typography sx={{ color: "#666", minWidth: "100px" }}>Phone</Typography>
-                            <Typography sx={{ color: "#000", fontWeight: 500 }}>{phone || "—"}</Typography>
-                        </Box> */}
-                    </Box>
-                ) : (
-                    /* Edit Mode */
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        <TextField
-                            name="name"
-                            label="Full Name"
-                            value={form.name}
-                            onChange={handleChange}
-                            fullWidth
-                            size="small"
-                        />
-                        <TextField
-                            name="username"
-                            label="Username"
-                            value={form.username}
-                            onChange={handleChange}
-                            fullWidth
-                            size="small"
-                        />
-                        <TextField
-                            name="email"
-                            label="Email"
-                            type="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            fullWidth
-                            size="small"
-                        />
-                        {/* <TextField
-                            label="Phone"
-                            value={phone}
-                            onChange={handleChange}
-                            fullWidth
-                            size="small"
-                        /> */}
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                            <Button
-                                variant="contained"
-                                sx={{ backgroundColor: PURPLE, color: "#fff" }}
-                                onClick={handleUpdate}
-                            >
-                                Save Changes
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                onClick={() => setEditingAccount(false)}
-                            >
-                                Cancel
-                            </Button>
+                                {!image && form.name?.charAt(0)}
+                            </Avatar>
+                            <Box>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="upload-photo"
+                                    style={{ display: "none" }}
+                                    onChange={handleImageUpload}
+                                />
+                                <label htmlFor="upload-photo">
+                                    <Button
+                                        variant="contained"
+                                        component="span"
+                                        sx={{ mr: 1, backgroundColor: PURPLE, color: "#fff" }}
+                                    >
+                                        Upload Photo
+                                    </Button>
+                                </label>
+                                {image && (
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        onClick={() => {
+                                            setImage(null);
+                                            localStorage.removeItem("profileImage");
+                                        }}
+                                    >
+                                        Remove
+                                    </Button>
+                                )}
+                            </Box>
                         </Box>
                     </Box>
-                )}
-            </Box>
 
-            <Divider />
+                    <Divider />
 
-            {/* Change Password */}
-            <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: PURPLE_DARK }}>
-                        Change Password
-                    </Typography>
-                    {!editingPassword && (
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => setEditingPassword(true)}
-                            sx={{ color: PURPLE_DARK, borderColor: PURPLE_DARK }}
-                        >
-                            Edit Password
-                        </Button>
-                    )}
-                </Box>
-
-                {!editingPassword ? (
-                    <Typography sx={{ color: "#666" }}>
-                        ●●●●●●●●
-                    </Typography>
-                ) : (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        {passwordError && (
-                            <Typography sx={{ color: "red", fontSize: "14px" }}>
-                                {passwordError}
+                    {/* Account Information */}
+                    <Box>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: PURPLE_DARK }}>
+                                Account Information
                             </Typography>
-                        )}
-                        <TextField
-                            label="Current Password"
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            fullWidth
-                            size="small"
-                        />
-                        <TextField
-                            label="New Password"
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            fullWidth
-                            size="small"
-                        />
-                        <TextField
-                            label="Confirm New Password"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            fullWidth
-                            size="small"
-                        />
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                            <Button
-                                variant="contained"
-                                sx={{ backgroundColor: PURPLE, color: "#fff" }}
-                                onClick={handlePasswordUpdate}
-                            >
-                                Update Password
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                onClick={() => setEditingPassword(false)}
-                            >
-                                Cancel
-                            </Button>
+                            {!editingAccount && (
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => setEditingAccount(true)}
+                                    sx={{ color: PURPLE_DARK, borderColor: PURPLE_DARK }}
+                                >
+                                    Edit Account
+                                </Button>
+                            )}
                         </Box>
+
+                        {/* Display Mode */}
+                        {!editingAccount ? (
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                                <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Typography sx={{ color: "#666", minWidth: "100px" }}>Full Name</Typography>
+                                    <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.name || "—"}</Typography>
+                                </Box>
+                                <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Typography sx={{ color: "#666", minWidth: "100px" }}>Username</Typography>
+                                    <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.username || "—"}</Typography>
+                                </Box>
+                                <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Typography sx={{ color: "#666", minWidth: "100px" }}>Email</Typography>
+                                    <Typography sx={{ color: "#000", fontWeight: 500 }}>{form.email || "—"}</Typography>
+                                </Box>
+                                {/* <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Typography sx={{ color: "#666", minWidth: "100px" }}>Phone</Typography>
+                                    <Typography sx={{ color: "#000", fontWeight: 500 }}>{phone || "—"}</Typography>
+                                </Box> */}
+                            </Box>
+                        ) : (
+                            /* Edit Mode */
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                <TextField
+                                    name="name"
+                                    label="Full Name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                                <TextField
+                                    name="username"
+                                    label="Username"
+                                    value={form.username}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                                <TextField
+                                    name="email"
+                                    label="Email"
+                                    type="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                                {/* <TextField
+                                    label="Phone"
+                                    value={phone}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    size="small"
+                                /> */}
+                                <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Button
+                                        variant="contained"
+                                        sx={{ backgroundColor: PURPLE, color: "#fff" }}
+                                        onClick={handleUpdate}
+                                    >
+                                        Save Changes
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setEditingAccount(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            </Box>
+                        )}
                     </Box>
-                )}
-            </Box>
 
-            <Divider />
+                    <Divider />
 
-            {/* Delete Account */}
-            <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: "#d32f2f", mb: 1 }}>
-                    Delete Account
-                </Typography>
-                <Button variant="outlined" color="error" onClick={handleDeleteAccount}>
-                    Delete Account
-                </Button>
-            </Box>
+                    {/* Change Password */}
+                    <Box>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: PURPLE_DARK }}>
+                                Change Password
+                            </Typography>
+                            {!editingPassword && (
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => setEditingPassword(true)}
+                                    sx={{ color: PURPLE_DARK, borderColor: PURPLE_DARK }}
+                                >
+                                    Edit Password
+                                </Button>
+                            )}
+                        </Box>
+
+                        {!editingPassword ? (
+                            <Typography sx={{ color: "#666" }}>
+                                ●●●●●●●●
+                            </Typography>
+                        ) : (
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                {passwordError && (
+                                    <Typography sx={{ color: "red", fontSize: "14px" }}>
+                                        {passwordError}
+                                    </Typography>
+                                )}
+                                <TextField
+                                    label="Current Password"
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    fullWidth
+                                    size="small"
+                                />
+                                <TextField
+                                    label="New Password"
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    fullWidth
+                                    size="small"
+                                />
+                                <TextField
+                                    label="Confirm New Password"
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    fullWidth
+                                    size="small"
+                                />
+                                <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Button
+                                        variant="contained"
+                                        sx={{ backgroundColor: PURPLE, color: "#fff" }}
+                                        onClick={handlePasswordUpdate}
+                                    >
+                                        Update Password
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setEditingPassword(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            </Box>
+                        )}
+                    </Box>
+
+                    <Divider />
+
+                    {/* Delete Account */}
+                    <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: "#d32f2f", mb: 1 }}>
+                            Delete Account
+                        </Typography>
+                        <Button variant="outlined" color="error" onClick={handleDeleteAccount}>
+                            Delete Account
+                        </Button>
+                    </Box>
+                </Box>
+            </Paper>
         </Box>
     );
 }
