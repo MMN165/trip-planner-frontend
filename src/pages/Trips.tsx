@@ -11,8 +11,17 @@ import {
 	Avatar,
 	Stack,
 	Divider,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogActions,
+	TextField,
+	CircularProgress,
 	Skeleton,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import FlightLandIcon from "@mui/icons-material/FlightLand";
 import AddIcon from "@mui/icons-material/Add";
@@ -151,28 +160,6 @@ function TripCard({ trip, isPast, onClick }) {
 						{formatDateRange(trip.startDate, trip.endDate)}
 					</Typography>
 				</Stack>
-
-				{trip.owner && (
-					<Stack direction="row" alignItems="center" gap={1}>
-						<Avatar
-							sx={{
-								width: 24,
-								height: 24,
-								fontSize: "0.65rem",
-								fontWeight: 700,
-								backgroundColor: PURPLE,
-								color: "#fff",
-							}}
-						>
-							{trip.owner.name?.[0] ??
-								trip.owner.email?.[0] ??
-								"?"}
-						</Avatar>
-						<Typography variant="caption" sx={{ color: "#6b7280" }}>
-							{trip.owner.name ?? trip.owner.email}
-						</Typography>
-					</Stack>
-				)}
 			</CardContent>
 		</Card>
 	);
@@ -242,20 +229,82 @@ export default function Trips({ onNav }) {
 	const [trips, setTrips] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [newTripLoading, setNewTripLoading] = useState(false);
+	const [destination, setDestination] = useState("");
+	const [startDate, setStartDate] = useState("");
+	const [endDate, setEndDate] = useState("");
+	const [formError, setFormError] = useState(null);
+
+	const loadTrips = async () => {
+		setLoading(true);
+		setError(null);
+		const start = Date.now();
+
+		try {
+			const res = await API.get("/trip");
+			setTrips(res.data);
+		} catch (err) {
+			setError("Failed to load trips.");
+		} finally {
+			const elapsed = Date.now() - start;
+			setTimeout(() => setLoading(false), Math.max(0, 2000 - elapsed));
+		}
+	};
 
 	useEffect(() => {
-		const start = Date.now();
-		API.get("/trip")
-			.then((res) => setTrips(res.data))
-			.catch(() => setError("Failed to load trips."))
-			.finally(() => {
-				const elapsed = Date.now() - start;
-				setTimeout(
-					() => setLoading(false),
-					Math.max(0, 2000 - elapsed),
-				);
-			});
+		loadTrips();
 	}, []);
+
+	const handleOpenDialog = () => {
+		setDestination("");
+		setStartDate("");
+		setEndDate("");
+		setFormError(null);
+		setIsDialogOpen(true);
+	};
+
+	const handleCreateTrip = async () => {
+		if (!destination || !startDate || !endDate) {
+			setFormError("Please enter destination, start date, and end date.");
+			return;
+		}
+
+		if (startDate > endDate) {
+			setFormError(
+				"End date must be the same as or after the start date.",
+			);
+			return;
+		}
+
+		const profile = JSON.parse(
+			localStorage.getItem("travelerProfile") || "{}",
+		);
+		const userId = profile?.id;
+
+		if (!userId) {
+			setFormError("Unable to create trip because no user is signed in.");
+			return;
+		}
+
+		setNewTripLoading(true);
+		setFormError(null);
+		setError(null);
+
+		try {
+			await API.post(`/recommendations/users/${userId}`, {
+				destination,
+				startDate,
+				endDate,
+			});
+			setIsDialogOpen(false);
+			await loadTrips();
+		} catch (err) {
+			setFormError("Unable to create a new trip. Please try again.");
+		} finally {
+			setNewTripLoading(false);
+		}
+	};
 
 	const upcoming = trips.filter((t) => isUpcoming(t));
 	const past = trips.filter((t) => !isUpcoming(t));
@@ -318,6 +367,7 @@ export default function Trips({ onNav }) {
 						<Button
 							variant="contained"
 							startIcon={<AddIcon />}
+							onClick={handleOpenDialog}
 							sx={{
 								backgroundColor: PURPLE,
 								color: "#fff",
@@ -332,6 +382,123 @@ export default function Trips({ onNav }) {
 							New trip
 						</Button>
 					</Box>
+					<Dialog
+						open={isDialogOpen}
+						onClose={() => setIsDialogOpen(false)}
+					>
+						<DialogTitle>New trip</DialogTitle>
+						<DialogContent>
+							<Stack spacing={2} sx={{ width: 420, mt: 1 }}>
+								<TextField
+									label="Destination"
+									fullWidth
+									size="small"
+									value={destination}
+									onChange={(e) =>
+										setDestination(e.target.value)
+									}
+								/>
+								<LocalizationProvider
+									dateAdapter={AdapterDateFns}
+								>
+									<Stack direction="row" gap={2}>
+										<DatePicker
+											label="Start date"
+											value={
+												startDate
+													? new Date(startDate)
+													: null
+											}
+											onChange={(value) =>
+												setStartDate(
+													value
+														? value
+																.toISOString()
+																.slice(0, 10)
+														: "",
+												)
+											}
+											renderInput={(params) => (
+												<TextField
+													{...params}
+													fullWidth
+													size="small"
+												/>
+											)}
+										/>
+
+										<DatePicker
+											label="End date"
+											value={
+												endDate
+													? new Date(endDate)
+													: null
+											}
+											onChange={(value) =>
+												setEndDate(
+													value
+														? value
+																.toISOString()
+																.slice(0, 10)
+														: "",
+												)
+											}
+											renderInput={(params) => (
+												<TextField
+													{...params}
+													fullWidth
+													size="small"
+												/>
+											)}
+										/>
+									</Stack>
+								</LocalizationProvider>
+								{formError && (
+									<Typography
+										variant="body2"
+										sx={{ color: "#ef4444" }}
+									>
+										{formError}
+									</Typography>
+								)}
+							</Stack>
+						</DialogContent>
+						<DialogActions sx={{ px: 3, pb: 2 }}>
+							<Button
+								onClick={() => setIsDialogOpen(false)}
+								sx={{ textTransform: "none" }}
+							>
+								Cancel
+							</Button>
+							<Button
+								variant="contained"
+								onClick={handleCreateTrip}
+								disabled={newTripLoading}
+								sx={{
+									textTransform: "none",
+									color: "#fff",
+									backgroundColor: PURPLE,
+									"&:hover": { backgroundColor: PURPLE_DARK },
+								}}
+							>
+								{newTripLoading ? (
+									<Stack
+										direction="row"
+										alignItems="center"
+										gap={1}
+									>
+										<CircularProgress
+											size={18}
+											color="inherit"
+										/>
+										Creating...
+									</Stack>
+								) : (
+									"Create trip"
+								)}
+							</Button>
+						</DialogActions>
+					</Dialog>
 
 					<Tabs
 						value={tab}

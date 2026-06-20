@@ -18,12 +18,20 @@ import API from "../api";
 
 // ── Category config ───────────────────────────────────────────────────────────
 const CATEGORY_STYLES = {
-	FOOD: { label: "Food", bg: "#fef3c7", color: "#92400e" },
+	DINING: { label: "Dining", bg: "#fef3c7", color: "#92400e" },
+	ACCOMMODATION: { label: "Accommodation", bg: "#d1fae5", color: "#065f46" },
+	MUSEUM: { label: "Museum", bg: "#e0f2fe", color: "#0c4a6e" },
 	SIGHTSEEING: { label: "Sightseeing", bg: "#dbeafe", color: "#1e40af" },
-	TRANSPORT: { label: "Transport", bg: "#f3f4f6", color: "#374151" },
-	ACCOMMODATION: { label: "Stay", bg: "#d1fae5", color: "#065f46" },
-	ACTIVITY: { label: "Activity", bg: "#ede9fe", color: "#5b21b6" },
 	SHOPPING: { label: "Shopping", bg: "#fce7f3", color: "#9d174d" },
+	CLASS: { label: "Class", bg: "#ede9fe", color: "#5b21b6" },
+	NIGHTLIFE: { label: "Nightlife", bg: "#fde68a", color: "#92400e" },
+	TRANSPORTATION: {
+		label: "Transportation",
+		bg: "#f3f4f6",
+		color: "#374151",
+	},
+	SPA: { label: "Spa", bg: "#dcfce7", color: "#166534" },
+	OTHER: { label: "Other", bg: "#f3f4f6", color: "#4b5563" },
 };
 function categoryStyle(cat) {
 	return (
