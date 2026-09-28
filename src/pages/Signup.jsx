@@ -29,7 +29,7 @@ import { buildTravelerProfile } from "../utils/formatTravelerProfile";
 import API from "../api";
 
 // Test connection immediately when file loads
-API.get("/users").then((res) => console.log("✅ Backend connected:", res.data));
+// API.get("/users").then((res) => console.log("✅ Backend connected:", res.data));
 const totalSteps = 4;
 
 const chipStyles = {

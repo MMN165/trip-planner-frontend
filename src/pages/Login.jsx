@@ -19,7 +19,7 @@ import API from "../api";
 export default function Login({ onNav }) {
 	const [showPw, setShowPw] = useState(false);
 	const [form, setForm] = useState({
-		email: "",
+		identifier: "",
 		password: "",
 	});
 	const handleChange = (e) => {
@@ -28,15 +28,27 @@ export default function Login({ onNav }) {
 
 	const handleSubmit = async () => {
 		try {
-			const response = await API.post("/users/login", {
-				email: form.email,
+			const identifier = form.identifier.trim();
+
+			const loginData = {
 				password: form.password,
-			});
+			};
+
+			if (identifier.includes("@")) {
+				loginData.email = identifier;
+			} else {
+				loginData.username = identifier;
+			}
+
+			const response = await API.post("/users/login", loginData);
+
 			console.log("Login successful!", response.data);
+
 			localStorage.setItem(
 				"travelerProfile",
 				JSON.stringify(response.data),
 			);
+
 			setTimeout(() => onNav("trips"));
 		} catch (err) {
 			console.error("Login error:", err.response?.data);
@@ -111,7 +123,8 @@ export default function Login({ onNav }) {
 							variant="outlined"
 							size="small"
 							sx={fieldSx}
-							name="email"
+							name="identifier"
+							value={form.identifier}
 							onChange={handleChange}
 						/>
 						<TextField

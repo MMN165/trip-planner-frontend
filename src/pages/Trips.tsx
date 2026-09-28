@@ -8,9 +8,7 @@ import {
 	CardContent,
 	Chip,
 	Button,
-	Avatar,
 	Stack,
-	Divider,
 	Dialog,
 	DialogTitle,
 	DialogContent,
@@ -49,7 +47,7 @@ function formatDateRange(startDate, endDate) {
 }
 
 function daysUntil(startDate) {
-	const diff = new Date(startDate) - today;
+    const diff = new Date(startDate).getTime() - today.getTime();
 	return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
@@ -70,8 +68,19 @@ function pickGradient(str) {
 }
 
 // ── Trip card ─────────────────────────────────────────────────────────────────
-function TripCard({ trip, isPast, onClick }) {
-	const days = daysUntil(trip.startDate);
+type Trip = {
+    id: number;
+    name: string;
+    destination: string;
+    startDate: string;
+    endDate: string;
+};
+function TripCard({trip, isPast, onClick}: {
+    trip: Trip;
+    isPast: boolean;
+    onClick: () => void;
+}) {
+    const days = daysUntil(trip.startDate);
 
 	return (
 		<Card
@@ -149,9 +158,11 @@ function TripCard({ trip, isPast, onClick }) {
 
 				<Stack
 					direction="row"
-					alignItems="center"
-					gap={0.75}
-					sx={{ mb: 2 }}
+					sx={{
+						mb: 2,
+						alignItems: "center",
+						gap: 0.75
+					}}
 				>
 					<CalendarTodayIcon
 						sx={{ fontSize: 14, color: "#9ca3af" }}
@@ -226,15 +237,16 @@ function EmptyState({ isPast }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Trips({ onNav }) {
 	const [tab, setTab] = useState(0);
-	const [trips, setTrips] = useState([]);
+	const [trips, setTrips] = useState<Trip[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [newTripLoading, setNewTripLoading] = useState(false);
 	const [destination, setDestination] = useState("");
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
-	const [formError, setFormError] = useState(null);
+	const [error, setError] = useState<string | null>(null);
+	const [formError, setFormError] = useState<string | null>(null);
 
 	const loadTrips = async () => {
 		setLoading(true);
@@ -347,11 +359,13 @@ export default function Trips({ onNav }) {
 					>
 						<Box>
 							<Stack
-								direction="row"
-								alignItems="center"
-								gap={1}
-								sx={{ mb: 0.5 }}
-							>
+							direction="row"
+							sx={{
+								mb: 2,
+								alignItems: "center",
+								gap: 1,
+							}}
+>
 								<PlaceIcon
 									sx={{ color: PURPLE, fontSize: 22 }}
 								/>
@@ -396,7 +410,11 @@ export default function Trips({ onNav }) {
 					<Dialog
 						open={isDialogOpen}
 						onClose={() => setIsDialogOpen(false)}
-						PaperProps={{ sx: { borderRadius: 3 } }}
+						slotProps={{
+							paper: {
+								sx: { borderRadius: 3 },
+							},
+						}}
 					>
 						<DialogTitle>New trip</DialogTitle>
 						<DialogContent>
@@ -415,27 +433,20 @@ export default function Trips({ onNav }) {
 								>
 									<DatePicker
 										label="Start date"
-										value={
-											startDate
-												? new Date(startDate)
-												: null
-										}
+										value={startDate ? new Date(startDate) : null}
 										onChange={(value) =>
 											setStartDate(
 												value
-													? value
-															.toISOString()
-															.slice(0, 10)
+													? value.toISOString().slice(0, 10)
 													: "",
 											)
 										}
-										renderInput={(params) => (
-											<TextField
-												{...params}
-												fullWidth
-												size="small"
-											/>
-										)}
+										slotProps={{
+											textField: {
+												fullWidth: true,
+												size: "small",
+											},
+										}}
 									/>
 
 									<DatePicker
@@ -452,13 +463,12 @@ export default function Trips({ onNav }) {
 													: "",
 											)
 										}
-										renderInput={(params) => (
-											<TextField
-												{...params}
-												fullWidth
-												size="small"
-											/>
-										)}
+										slotProps={{
+											textField: {
+												fullWidth: true,
+												size: "small",
+											},
+										}}
 									/>
 								</LocalizationProvider>
 								{formError && (
@@ -492,8 +502,10 @@ export default function Trips({ onNav }) {
 								{newTripLoading ? (
 									<Stack
 										direction="row"
-										alignItems="center"
-										gap={1}
+										sx={{
+											alignItems: "center",
+											gap: 1
+										}}
 									>
 										<CircularProgress
 											size={18}
@@ -533,8 +545,10 @@ export default function Trips({ onNav }) {
 							label={
 								<Stack
 									direction="row"
-									alignItems="center"
-									gap={1}
+									sx={{
+										alignItems: "center",
+										gap: 1,
+									}}
 								>
 									<FlightTakeoffIcon sx={{ fontSize: 16 }} />
 									Upcoming
@@ -559,9 +573,11 @@ export default function Trips({ onNav }) {
 							label={
 								<Stack
 									direction="row"
-									alignItems="center"
-									gap={1}
-								>
+									sx={{
+										alignItems: "center",
+										gap: 1,
+									}}
+								>	
 									<FlightLandIcon sx={{ fontSize: 16 }} />
 									Past
 									{!loading && (
