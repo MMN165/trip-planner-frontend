@@ -315,15 +315,22 @@ export default function Trips({ onNav }) {
 		setError(null);
 
 		try {
-			await API.post(`/recommendations/users/${userId}`, {
+			await API.post(`/recommendations/${userId}`, {
 				destination,
 				startDate,
 				endDate,
 			});
+
+			// Close the dialog
 			setIsDialogOpen(false);
+
+			// Reload the trips from the database
 			await loadTrips();
+
 		} catch (err) {
-			setFormError("Unable to create a new trip. Please try again.");
+			setFormError(
+				"Unable to create a new trip. Please try again.",
+			);
 		} finally {
 			setNewTripLoading(false);
 		}

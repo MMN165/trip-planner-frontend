@@ -3,8 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+console.log("Google Client ID:", clientId);
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
-  </StrictMode>,
-)
+  </StrictMode>
+);

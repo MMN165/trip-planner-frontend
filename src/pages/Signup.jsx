@@ -17,19 +17,16 @@ import {
 import PersonIcon from "@mui/icons-material/Person";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
-import GroupIcon from "@mui/icons-material/Group";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import PublicIcon from "@mui/icons-material/Public";
-import EventIcon from "@mui/icons-material/Event";
-import GoogleButton from "../components/GoogleButton";
+// import { GoogleLogin } from "@react-oauth/google";
 import { EyeIcon } from "../assets/icons/EyeIcon";
 import { BG, PURPLE, PURPLE_DARK, fieldSx } from "./../constants";
 import { buildTravelerProfile } from "../utils/formatTravelerProfile";
+
 import API from "../api";
 
 // Test connection immediately when file loads
-// API.get("/users").then((res) => console.log("✅ Backend connected:", res.data));
+API.get("/users").then((res) => console.log("✅ Backend connected:", res.data));
 const totalSteps = 4;
 
 const chipStyles = {
@@ -135,30 +132,81 @@ export default function Signup({ onNav }) {
 		setShowSurvey(true);
 		setStep(0);
 	};
+	// const [googleUserId, setGoogleUserId] = useState(null);
+	// const handleGoogleSignup = async (credentialResponse) => {
+	// 	try {
+	// 		console.log("Google credential received");
+
+	// 		const response = await API.post("/users/google", {
+	// 			credential: credentialResponse.credential,
+	// 		});
+
+	// 		console.log("Google signup response:", response.data);
+
+	// 		// Save Google user's information
+	// 		setSignupValues((prev) => ({
+	// 			...prev,
+	// 			fullName: response.data.name || "",
+	// 			email: response.data.email || "",
+	// 		}));
+
+	// 		// Save the user ID temporarily
+	// 		setGoogleUserId(response.data.id);
+
+	// 		// Move to your survey
+	// 		setShowSurvey(true);
+	// 		setStep(0);
+
+	// 	} catch (error) {
+	// 		console.error("Google signup failed:", error);
+	// 	}
+	// };
+
+	
 	const handleSubmit = async () => {
 		try {
+
+			// if (googleUserId) {
+			// 	// Google user was already created
+			// 	userId = googleUserId;
+			// } else {
+			// 	// Normal email/password signup
+			// 	const response = await API.post("/users/register", {
+			// 		name: signupValues.fullName,
+			// 		email: signupValues.email,
+			// 		password: signupValues.password,
+			// 	});
+
+			// 	userId = response.data.id;
+			// }
 			const response = await API.post("/users/register", {
 				name: signupValues.fullName,
 				email: signupValues.email,
 				password: signupValues.password,
 			});
-			console.log("User saved!");
 
-			const userId = response.data.id;
+			let userId = response.data.id;
 
-			// build preferences payload
 			const profile = buildTravelerProfile(values, signupValues);
+
 			profile.name = signupValues.fullName;
 			profile.email = signupValues.email;
 			profile.id = userId;
-			setShowSurvey(true);
-			setStep(0);
 
-			localStorage.setItem("travelerProfile", JSON.stringify(profile));
-			await API.put(`/users/${userId}/preferences`, profile.preferences);
+			localStorage.setItem(
+				"travelerProfile",
+				JSON.stringify(profile)
+			);
+
+			await API.put(
+				`/users/${userId}/preferences`,
+				profile.preferences
+			);
+
 			setSubmitted(true);
 
 			setTimeout(() => onNav("trips"), 1400);
+
 		} catch (error) {
 			console.error("Registration failed:", error);
 		}
@@ -241,8 +289,12 @@ export default function Signup({ onNav }) {
 						>
 							Start exploring with MapMuse today
 						</Typography>
-
-						<GoogleButton label="Sign up with Google" />
+						{/* <GoogleLogin
+							onSuccess={handleGoogleSignup}
+							onError={() => {
+								console.log("Google signup failed");
+							}}
+						/>
 
 						<Divider
 							sx={{
@@ -252,7 +304,7 @@ export default function Signup({ onNav }) {
 							}}
 						>
 							or
-						</Divider>
+						</Divider> */}
 
 						<Stack spacing={2}>
 							<TextField

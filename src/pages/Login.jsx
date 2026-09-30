@@ -11,9 +11,10 @@ import {
 	IconButton,
 	Button,
 } from "@mui/material";
-import GoogleButton from "../components/GoogleButton";
+// import GoogleButton from "../components/GoogleButton";
 import { EyeIcon } from "../assets/icons/EyeIcon";
 import { PURPLE, PURPLE_DARK, BG, fieldSx } from "../constants";
+// import { GoogleLogin } from "@react-oauth/google";
 import API from "../api";
 
 export default function Login({ onNav }) {
@@ -56,6 +57,18 @@ export default function Login({ onNav }) {
 			console.error("Full error:", err);
 		}
 	};
+	// const handleGoogleLogin = async (credentialResponse) => {
+	// 	try {
+	// 		const response = await API.post("/users/google/login", {
+	// 			credential: credentialResponse.credential
+	// 		});
+
+	// 		console.log(response.data);
+
+	// 	} catch (error) {
+	// 		console.error("Google login failed:", error);
+	// 	}
+	// };
 
 	useEffect(() => {
 		const prev = document.body.style.overflow;
@@ -107,13 +120,19 @@ export default function Login({ onNav }) {
 					</Typography>
 
 					{/* SSO */}
-					<GoogleButton label="Continue with Google" />
-
-					<Divider
+					{/* <GoogleLogin
+						onSuccess={(credentialResponse) => {
+							console.log("Google success:", credentialResponse);
+						}}
+						onError={() => {
+							console.log("Google Login Failed");
+						}}
+					/> */}
+					{/* <Divider
 						sx={{ my: 2.5, color: "#9ca3af", fontSize: "0.75rem" }}
 					>
 						or
-					</Divider>
+					</Divider> */}
 
 					{/* fields */}
 					<Stack spacing={2}>
